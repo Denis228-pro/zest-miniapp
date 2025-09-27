@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ZeSt - Telegram Mini App</title>
+    <meta name="description" content="Энергетические напитки в Нарьян-Маре через Telegram">
+    
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 0 16px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #e33a1b, #ff6b4a);
+            color: white;
+            padding: 20px 16px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* User Info */
+        .user-info {
+            background: var(--tg-theme-secondary-bg-color, #f8f9fa);
+            padding: 16px;
+            margin: 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e33a1b, #ff6b4a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .user-details h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .user-details p {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #999);
+        }
+
+        /* Categories */
+        .categories {
+            padding: 16px;
+        }
+
+        .categories h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: var(--tg-theme-text-color, #000);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .category-card {
+            background: var(--tg-theme-secondary-bg-color, #f8f9fa);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(227, 58, 27, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .category-card:active::before {
+            left: 100%;
+        }
+
+        .category-card:active {
+            transform: scale(0.95);
+            border-color: var(--tg-theme-button-color, #e33a1b);
+        }
+
+        .category-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .category-card h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .category-card p {
+            font-size: 12px;
+            color: var(--tg-theme-hint-color, #999);
+        }
+
+        /* Products */
+        .products {
+            padding: 16px;
+            display: none;
+        }
+
+        .products.active {
+            display: block;
+        }
+
+        .products h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            background: var(--tg-theme-button-color, #e33a1b);
+            color: var(--tg-theme-button-text-color, white);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+
+        .product-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .product-card {
+            background: var(--tg-theme-secondary-bg-color, #f8f9fa);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .product-card:active {
+            transform: scale(0.98);
+            border-color: var(--tg-theme-button-color, #e33a1b);
+        }
+
+        .product-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #e33a1b, #ff6b4a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .product-brand {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #999);
+            margin-bottom: 8px;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--tg-theme-button-color, #e33a1b);
+        }
+
+        .product-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .add-btn {
+            background: var(--tg-theme-button-color, #e33a1b);
+            color: var(--tg-theme-button-text-color, white);
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 80px;
+        }
+
+        .add-btn:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+
+        .quantity-controls {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: var(--tg-theme-button-color, #e33a1b);
+            border-radius: 20px;
+            padding: 4px;
+        }
+
+        .quantity-controls.active {
+            display: flex;
+        }
+
+        .quantity-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .quantity-btn:active {
+            background: rgba(255,255,255,0.4);
+        }
+
+        .quantity {
+            color: white;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* Cart */
+        .cart-summary {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--tg-theme-secondary-bg-color, #f8f9fa);
+            padding: 16px;
+            border-top: 1px solid var(--tg-theme-hint-color, #e0e0e0);
+            display: none;
+            z-index: 1000;
+        }
+
+        .cart-summary.active {
+            display: block;
+        }
+
+        .cart-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .cart-total {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .cart-count {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #999);
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background: var(--tg-theme-button-color, #e33a1b);
+            color: var(--tg-theme-button-text-color, white);
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkout-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .slide-out {
+            animation: slideOut 0.3s ease-out;
+        }
+
+        /* Haptic feedback indicator */
+        .haptic-feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .haptic-feedback.show {
+            opacity: 1;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--tg-theme-hint-color, #e0e0e0);
+            border-top: 3px solid var(--tg-theme-button-color, #e33a1b);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Special effects */
+        .pulse {
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 360px) {
+            .category-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .product-card {
+                padding: 12px;
+            }
+            
+            .product-image {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>⚡ ZeSt</h1>
+        <div class="subtitle">Энергия Севера в Нарьян-Маре</div>
+    </div>
+
+    <!-- User Info -->
+    <div class="user-info" id="userInfo">
+        <div class="user-avatar" id="userAvatar">👤</div>
+        <div class="user-details">
+            <h3 id="userName">Загрузка...</h3>
+            <p id="userStatus">Подключение к Telegram...</p>
+        </div>
+    </div>
+
+    <!-- Categories Section -->
+    <div class="categories" id="categoriesSection">
+        <h2>🛍️ Категории товаров</h2>
+        <div class="category-grid">
+            <div class="category-card" onclick="showProducts('energy')">
+                <div class="category-icon">⚡</div>
+                <h3>Энергетики</h3>
+                <p>Red Bull, Monster, Burn</p>
+            </div>
+            <div class="category-card" onclick="showProducts('cola')">
+                <div class="category-icon">🥤</div>
+                <h3>Кола</h3>
+                <p>Coca-Cola, Pepsi</p>
+            </div>
+            <div class="category-card" onclick="showProducts('lemonade')">
+                <div class="category-icon">🍋</div>
+                <h3>Лимонады</h3>
+                <p>Sprite, Fanta</p>
+            </div>
+            <div class="category-card" onclick="showProducts('water')">
+                <div class="category-icon">💧</div>
+                <h3>Вода</h3>
+                <p>Минеральная вода</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <div class="products" id="productsSection">
+        <h2>
+            <button class="back-btn" onclick="showCategories()">← Назад</button>
+            <span id="categoryTitle">Товары</span>
+        </h2>
+        <div class="product-list" id="productList">
+            <!-- Products will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Cart Summary -->
+    <div class="cart-summary" id="cartSummary">
+        <div class="cart-info">
+            <div class="cart-total" id="cartTotal">0₽</div>
+            <div class="cart-count" id="cartCount">0 товаров</div>
+        </div>
+        <button class="checkout-btn" onclick="checkout()">
+            🛒 Оформить заказ
+        </button>
+    </div>
+
+    <!-- Haptic Feedback Indicator -->
+    <div class="haptic-feedback" id="hapticFeedback"></div>
+
+    <script>
+        // Telegram Web App initialization
+        const tg = window.Telegram.WebApp;
+        
+        // Initialize the app
+        tg.ready();
+        tg.expand();
+        
+        // Set theme colors
+        document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#ffffff');
+        document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color || '#000000');
+        document.documentElement.style.setProperty('--tg-theme-hint-color', tg.themeParams.hint_color || '#999999');
+        document.documentElement.style.setProperty('--tg-theme-button-color', tg.themeParams.button_color || '#e33a1b');
+        document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.themeParams.button_text_color || '#ffffff');
+        document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', tg.themeParams.secondary_bg_color || '#f8f9fa');
+
+        // Global variables
+        let cart = {};
+        let currentCategory = '';
+        
+        // Sample products data
+        const products = {
+            energy: [
+                { id: 1, name: 'Red Bull Energy Drink', brand: 'Red Bull', price: 120, icon: '🔋' },
+                { id: 2, name: 'Monster Energy Original', brand: 'Monster', price: 150, icon: '👹' },
+                { id: 3, name: 'Burn Original', brand: 'Burn', price: 110, icon: '🔥' },
+                { id: 4, name: 'Adrenaline Rush', brand: 'Adrenaline', price: 95, icon: '💥' }
+            ],
+            cola: [
+                { id: 5, name: 'Coca-Cola Classic', brand: 'Coca-Cola', price: 80, icon: '🥤' },
+                { id: 6, name: 'Pepsi Cola', brand: 'Pepsi', price: 75, icon: '🥤' },
+                { id: 7, name: 'Coca-Cola Zero', brand: 'Coca-Cola', price: 85, icon: '🖤' }
+            ],
+            lemonade: [
+                { id: 8, name: 'Sprite Лимон-Лайм', brand: 'Coca-Cola', price: 70, icon: '🍋' },
+                { id: 9, name: 'Fanta Orange', brand: 'Coca-Cola', price: 75, icon: '🍊' },
+                { id: 10, name: '7UP', brand: '7UP', price: 70, icon: '💚' }
+            ],
+            water: [
+                { id: 11, name: 'Aqua Minerale', brand: 'Aqua Minerale', price: 45, icon: '💧' },
+                { id: 12, name: 'BonAqua', brand: 'Coca-Cola', price: 50, icon: '🌊' },
+                { id: 13, name: 'Святой Источник', brand: 'Святой Исто��ник', price: 40, icon: '⛲' }
+            ]
+        };
+
+        // Initialize user info
+        function initUserInfo() {
+            const user = tg.initDataUnsafe?.user;
+            
+            if (user) {
+                document.getElementById('userName').textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+                document.getElementById('userStatus').textContent = `@${user.username || 'telegram_user'}`;
+                
+                // Set user avatar
+                const avatar = document.getElementById('userAvatar');
+                if (user.photo_url) {
+                    avatar.style.backgroundImage = `url(${user.photo_url})`;
+                    avatar.style.backgroundSize = 'cover';
+                    avatar.textContent = '';
+                } else {
+                    avatar.textContent = user.first_name.charAt(0).toUpperCase();
+                }
+            } else {
+                document.getElementById('userName').textContent = 'Гость';
+                document.getElementById('userStatus').textContent = 'Добро пожаловать в ZeSt!';
+            }
+        }
+
+        // Show products for category
+        function showProducts(category) {
+            hapticFeedback('impact');
+            
+            currentCategory = category;
+            const categoryNames = {
+                energy: '⚡ Энергетики',
+                cola: '🥤 Кола',
+                lemonade: '🍋 Лимонады',
+                water: '💧 Вода'
+            };
+            
+            document.getElementById('categoryTitle').textContent = categoryNames[category];
+            document.getElementById('categoriesSection').style.display = 'none';
+            document.getElementById('productsSection').classList.add('active', 'slide-in');
+            
+            renderProducts(category);
+        }
+
+        // Show categories
+        function showCategories() {
+            hapticFeedback('impact');
+            
+            document.getElementById('productsSection').classList.remove('active');
+            document.getElementById('categoriesSection').style.display = 'block';
+        }
+
+        // Render products
+        function renderProducts(category) {
+            const productList = document.getElementById('productList');
+            const categoryProducts = products[category] || [];
+            
+            productList.innerHTML = categoryProducts.map(product => `
+                <div class="product-card" onclick="showProductDetails(${product.id})">
+                    <div class="product-image">${product.icon}</div>
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-brand">${product.brand}</div>
+                        <div class="product-price">${product.price}₽</div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="add-btn" onclick="event.stopPropagation(); addToCart(${product.id})" id="addBtn${product.id}">
+                            Добавить
+                        </button>
+                        <div class="quantity-controls" id="quantityControls${product.id}">
+                            <button class="quantity-btn" onclick="event.stopPropagation(); updateQuantity(${product.id}, -1)">−</button>
+                            <span class="quantity" id="quantity${product.id}">0</span>
+                            <button class="quantity-btn" onclick="event.stopPropagation(); updateQuantity(${product.id}, 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Update cart display for existing items
+            updateCartDisplay();
+        }
+
+        // Add to cart
+        function addToCart(productId) {
+            hapticFeedback('notification');
+            
+            if (!cart[productId]) {
+                cart[productId] = 0;
+            }
+            cart[productId]++;
+            
+            updateProductDisplay(productId);
+            updateCartSummary();
+            
+            // Show success animation
+            const addBtn = document.getElementById(`addBtn${productId}`);
+            addBtn.classList.add('pulse');
+            setTimeout(() => addBtn.classList.remove('pulse'), 600);
+        }
+
+        // Update quantity
+        function updateQuantity(productId, change) {
+            hapticFeedback('selection');
+            
+            if (!cart[productId]) cart[productId] = 0;
+            
+            cart[productId] += change;
+            
+            if (cart[productId] <= 0) {
+                delete cart[productId];
+            }
+            
+            updateProductDisplay(productId);
+            updateCartSummary();
+        }
+
+        // Update product display
+        function updateProductDisplay(productId) {
+            const quantity = cart[productId] || 0;
+            const addBtn = document.getElementById(`addBtn${productId}`);
+            const quantityControls = document.getElementById(`quantityControls${productId}`);
+            const quantitySpan = document.getElementById(`quantity${productId}`);
+            
+            if (quantity > 0) {
+                addBtn.style.display = 'none';
+                quantityControls.classList.add('active');
+                quantitySpan.textContent = quantity;
+            } else {
+                addBtn.style.display = 'block';
+                quantityControls.classList.remove('active');
+            }
+        }
+
+        // Update cart display for all products
+        function updateCartDisplay() {
+            Object.keys(cart).forEach(productId => {
+                updateProductDisplay(parseInt(productId));
+            });
+        }
+
+        // Update cart summary
+        function updateCartSummary() {
+            const cartItems = Object.keys(cart);
+            const totalItems = cartItems.reduce((sum, id) => sum + cart[id], 0);
+            
+            if (totalItems > 0) {
+                const total = cartItems.reduce((sum, id) => {
+                    const product = findProductById(parseInt(id));
+                    return sum + (product ? product.price * cart[id] : 0);
+                }, 0);
+                
+                document.getElementById('cartTotal').textContent = `${total}₽`;
+                document.getElementById('cartCount').textContent = `${totalItems} ${getItemsWord(totalItems)}`;
+                document.getElementById('cartSummary').classList.add('active');
+                
+                // Update main button
+                tg.MainButton.setText(`🛒 Заказать за ${total}₽`);
+                tg.MainButton.show();
+            } else {
+                document.getElementById('cartSummary').classList.remove('active');
+                tg.MainButton.hide();
+            }
+        }
+
+        // Find product by ID
+        function findProductById(id) {
+            for (const category in products) {
+                const product = products[category].find(p => p.id === id);
+                if (product) return product;
+            }
+            return null;
+        }
+
+        // Get correct word form for items count
+        function getItemsWord(count) {
+            if (count % 10 === 1 && count % 100 !== 11) return 'товар';
+            if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) return 'товара';
+            return 'товаров';
+        }
+
+        // Show product details
+        function showProductDetails(productId) {
+            hapticFeedback('impact');
+            
+            const product = findProductById(productId);
+            if (!product) return;
+            
+            tg.showPopup({
+                title: product.name,
+                message: `${product.brand}\nЦена: ${product.price}₽\n\nДобавить в корзину?`,
+                buttons: [
+                    { type: 'default', text: 'Добавить' },
+                    { type: 'cancel', text: 'Отмена' }
+                ]
+            }, (buttonId) => {
+                if (buttonId === 'default') {
+                    addToCart(productId);
+                }
+            });
+        }
+
+        // Checkout
+        function checkout() {
+            hapticFeedback('notification');
+            
+            const cartItems = Object.keys(cart);
+            if (cartItems.length === 0) return;
+            
+            const orderData = {
+                items: cartItems.map(id => ({
+                    product: findProductById(parseInt(id)),
+                    quantity: cart[id]
+                })),
+                total: cartItems.reduce((sum, id) => {
+                    const product = findProductById(parseInt(id));
+                    return sum + (product ? product.price * cart[id] : 0);
+                }, 0),
+                user: tg.initDataUnsafe?.user
+            };
+            
+            // Send data to bot
+            tg.sendData(JSON.stringify(orderData));
+        }
+
+        // Haptic feedback
+        function hapticFeedback(type) {
+            if (tg.HapticFeedback) {
+                switch (type) {
+                    case 'impact':
+                        tg.HapticFeedback.impactOccurred('medium');
+                        break;
+                    case 'notification':
+                        tg.HapticFeedback.notificationOccurred('success');
+                        break;
+                    case 'selection':
+                        tg.HapticFeedback.selectionChanged();
+                        break;
+                }
+            }
+            
+            // Visual feedback
+            const feedback = document.getElementById('hapticFeedback');
+            feedback.textContent = type === 'notification' ? '✓' : '•';
+            feedback.classList.add('show');
+            setTimeout(() => feedback.classList.remove('show'), 300);
+        }
+
+        // Handle main button click
+        tg.MainButton.onClick(checkout);
+
+        // Handle back button
+        tg.BackButton.onClick(() => {
+            if (document.getElementById('productsSection').classList.contains('active')) {
+                showCategories();
+            } else {
+                tg.close();
+            }
+        });
+
+        // Show back button when in products view
+        function updateBackButton() {
+            if (document.getElementById('productsSection').classList.contains('active')) {
+                tg.BackButton.show();
+            } else {
+                tg.BackButton.hide();
+            }
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initUserInfo();
+            updateCartSummary();
+            
+            // Add loading animation
+            setTimeout(() => {
+                document.body.classList.add('loaded');
+            }, 500);
+        });
+
+        // Handle viewport changes
+        tg.onEvent('viewportChanged', function() {
+            // Adjust layout if needed
+            console.log('Viewport changed:', tg.viewportHeight, tg.viewportStableHeight);
+        });
+
+        // Handle theme changes
+        tg.onEvent('themeChanged', function() {
+            // Update theme colors
+            document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#ffffff');
+            document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color || '#000000');
+            document.documentElement.style.setProperty('--tg-theme-hint-color', tg.themeParams.hint_color || '#999999');
+            document.documentElement.style.setProperty('--tg-theme-button-color', tg.themeParams.button_color || '#e33a1b');
+            document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.themeParams.button_text_color || '#ffffff');
+            document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', tg.themeParams.secondary_bg_color || '#f8f9fa');
+        });
+
+        // Add some easter eggs
+        let tapCount = 0;
+        document.querySelector('.header h1').addEventListener('click', function() {
+            tapCount++;
+            if (tapCount >= 5) {
+                hapticFeedback('notification');
+                tg.showAlert('🎉 Секретный режим активирован! Скидка 10% на все товары!');
+                tapCount = 0;
+                
+                // Add discount effect
+                document.querySelectorAll('.product-price').forEach(price => {
+                    const originalPrice = parseInt(price.textContent);
+                    const discountPrice = Math.round(originalPrice * 0.9);
+                    price.innerHTML = `<span style="text-decoration: line-through; color: #999;">${originalPrice}₽</span> ${discountPrice}₽`;
+                });
+            }
+        });
+
+        // Performance optimization
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function() {
+                // Handle resize
+                updateBackButton();
+            }, 250);
+        });
+
+        // Prevent zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>
