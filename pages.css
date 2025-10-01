@@ -1,0 +1,366 @@
+/* Page-Specific Styles */
+
+/* Age Gate */
+.age-gate {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.age-gate-content {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 4px;
+  text-align: center;
+  max-width: 90%;
+  width: 100%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.age-gate-content h1 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.age-gate-content p {
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  color: #555;
+}
+
+.age-gate-warning {
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  color: #856404;
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1.5rem 0;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.age-gate-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.age-gate-confirm {
+  background-color: var(--success-color);
+}
+
+.age-gate-confirm:hover {
+  background-color: #3d8b40;
+}
+
+.age-gate-deny {
+  background-color: var(--error-color);
+}
+
+.age-gate-deny:hover {
+  background-color: #d32f2f;
+}
+
+.age-restriction-badge {
+  display: inline-block;
+  background-color: var(--error-color);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+/* Header */
+header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 1rem 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.site-logo {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.site-logo a {
+  color: white;
+  text-decoration: none;
+}
+
+/* Main Content */
+main {
+  padding: 1rem 0;
+  margin-bottom: calc(var(--bottom-nav-height) + 1rem);
+  min-height: calc(100vh - var(--header-height) - var(--bottom-nav-height) - 2rem);
+}
+
+/* Catalog Page */
+.catalog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.search-container {
+  margin-bottom: 1rem;
+}
+
+.filters {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-direction: column;
+}
+
+.filters .form-control {
+  width: 100%;
+}
+
+#products-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+/* Club Page */
+.club-hero {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: var(--light-gray);
+  border-radius: 4px;
+}
+
+.club-benefits {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.benefit-card {
+  text-align: center;
+  padding: 1rem;
+}
+
+.benefit-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* Services Page */
+.services-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.service-card {
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: white;
+}
+
+.service-card h3 {
+  margin-top: 0;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+/* Cart Page */
+.cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cart-items {
+  margin-bottom: 1.5rem;
+  background-color: white;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.cart-summary {
+  background-color: var(--light-gray);
+  padding: 1rem;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border: 1px solid var(--border-color);
+  margin-bottom: calc(var(--bottom-nav-height) + 1rem);
+}
+
+.cart-total {
+  font-size: 1.25rem;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Profile Page */
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.subscription-status {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
+}
+
+.order-history {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  margin-bottom: calc(var(--bottom-nav-height) + 1rem);
+}
+
+#orders-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+#orders-list li {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+#orders-list li:last-child {
+  border-bottom: none;
+}
+
+/* Admin Panel */
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.admin-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+}
+
+.admin-tab {
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+}
+
+.admin-tab.active {
+  border-bottom: 3px solid var(--primary-color);
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.admin-content {
+  display: none;
+}
+
+.admin-content.active {
+  display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .main-nav ul {
+    display: none;
+  }
+  
+  .bottom-nav {
+    display: flex;
+  }
+  
+  .filters {
+    flex-direction: column;
+  }
+  
+  .filters .form-control {
+    min-width: auto;
+  }
+  
+  .cart-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .cart-item-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .cart-summary {
+    flex-direction: column;
+  }
+  
+  .age-gate-content {
+    padding: 1.5rem;
+    width: auto;
+  }
+  
+  .club-benefits,
+  .services-list,
+  #products-container {
+    grid-template-columns: 1fr;
+  }
+  
+  main {
+    padding: 1rem 0;
+  }
+  
+  .catalog-header,
+  .cart-header,
+  .profile-header {
+    gap: 0.5rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .bottom-nav {
+    display: none;
+  }
+}
