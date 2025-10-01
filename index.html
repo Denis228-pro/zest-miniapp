@@ -2,733 +2,234 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZeSt Shop - Энергетики и напитки в Нарьян-Маре</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZeSt Energy Drinks</title>
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/pages.css">
+    <link rel="stylesheet" href="styles/styles.css">
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <!-- Skip to main content for accessibility -->
-    <a href="#main-content" class="skip-link visually-hidden">Перейти к основному содержимому</a>
-    
-    <!-- Header -->
-    <header class="header" role="banner">
-        <div class="container">
-            <div class="header-left" aria-label="Информация о магазине">
-                <div class="logo">
-                    <h1 aria-label="ZeSt Shop - Энергетики и напитки в Нарьян-Маре">ZeSt Shop</h1>
-                    <p class="location" aria-label="Местоположение: Нарьян-Мар">
-                        <span aria-hidden="true">📍</span>
-                        <span class="visually-hidden">Местоположение: </span>
-                        Нарьян-Мар
-                    </p>
-                </div>
+    <!-- Age Gate - shown on first launch -->
+    <div id="age-gate" class="age-gate">
+        <div class="age-gate-content">
+            <h1>Подтверждение возраста</h1>
+            <p>Для продолжения, пожалуйста, подтвердите, что вам есть 18 лет</p>
+            
+            <div class="age-gate-warning">
+                <strong>Внимание!</strong> Потребление энергетических напитков не рекомендуется лицам младше 18 лет
             </div>
-            <div class="header-right" aria-label="Информация о пользователе">
-                <div class="user-info">
-                    <div class="loyalty-status" id="loyaltyStatus" aria-live="polite">
-                        <span class="club-badge" aria-label="Программа лояльности ZeSt Club">ZeSt Club</span>
-                        <span class="status" id="userStatus">Гость</span>
-                    </div>
-                    <div class="user-greeting" id="userGreeting" aria-live="polite">
-                        <span id="greetingText">Добро пожаловать!</span>
-                    </div>
-                </div>
+            
+            <div class="age-gate-buttons">
+                <button id="age-gate-confirm" class="btn age-gate-confirm btn-block">Мне есть 18 лет</button>
+                <button id="age-gate-deny" class="btn age-gate-deny btn-block">Мне нет 18 лет</button>
             </div>
+            
+            <div class="age-restriction-badge">18+</div>
         </div>
-    </header>
+    </div>
 
-    <!-- Navigation -->
-    <nav class="nav-tabs" role="navigation" aria-label="Основная навигация">
-        <button class="nav-tab active" onclick="showTab('catalog')" aria-label="Каталог" role="tab" aria-selected="true" tabindex="0">
-            <i class="icon" aria-hidden="true">🥤</i>
-            <span>Каталог</span>
-        </button>
-        <button class="nav-tab" onclick="showTab('club')" aria-label="ZeSt Club" role="tab" aria-selected="false" tabindex="-1">
-            <i class="icon" aria-hidden="true">⭐</i>
-            <span>ZeSt Club</span>
-        </button>
-        <button class="nav-tab" onclick="showTab('cart')" aria-label="Корзина" role="tab" aria-selected="false" tabindex="-1">
-            <i class="icon" aria-hidden="true">🛒</i>
-            <span>Корзина</span>
-            <span class="cart-badge" id="cartBadge" aria-label="Количество товаров в корзине">0</span>
-        </button>
-        <button class="nav-tab" onclick="showTab('orders')" aria-label="Заказы" role="tab" aria-selected="false" tabindex="-1">
-            <i class="icon" aria-hidden="true">📦</i>
-            <span>Заказы</span>
-        </button>
-        <!-- Admin Tab - Completely hidden -->
-        <button class="nav-tab hidden" id="adminTab" onclick="showAdminLogin()" aria-label="Админ панель" role="tab" aria-selected="false" tabindex="-1">
-            <i class="icon" aria-hidden="true">⚙️</i>
-            <span>Админ</span>
-        </button>
-    </nav>
+    <!-- Main App Content (hidden until age confirmed) -->
+    <div id="app" class="hidden">
+        <!-- Header -->
+        <header>
+            <div class="container header-content">
+                <div class="site-logo">
+                    <a href="#" data-page="catalog">ZeSt Energy Drinks</a>
+                </div>
+            </div>
+        </header>
 
-    <main id="main-content">
-        <!-- Hidden admin access button -->
-        <button id="adminAccess" onclick="showAdminLogin()" aria-label="Админ панель" title="Админ панель"></button>
-        
-        <!-- Catalog Tab -->
-        <div class="tab-content active" id="catalog" role="tabpanel" aria-labelledby="catalog-tab">
-            <!-- Search -->
-            <div class="search-container">
-                <label for="searchInput" class="visually-hidden">Поиск напитков</label>
-                <input type="text" id="searchInput" placeholder="Поиск напитков..." aria-label="Поиск напитков">
-                <button class="search-btn" aria-label="Поиск">
-                    <span aria-hidden="true">🔍</span>
-                </button>
-            </div>
-            
-            <!-- Categories -->
-            <div class="categories" role="tablist" aria-label="Категории товаров">
-                <button class="category-btn active" onclick="filterProducts('all')" role="tab" aria-selected="true" aria-label="Все категории" tabindex="0">Все</button>
-                <button class="category-btn" onclick="filterProducts('energy')" role="tab" aria-selected="false" aria-label="Энергетики" tabindex="-1">Энергетики</button>
-                <button class="category-btn" onclick="filterProducts('soda')" role="tab" aria-selected="false" aria-label="Газировка" tabindex="-1">Газировка</button>
-                <button class="category-btn" onclick="filterProducts('juice')" role="tab" aria-selected="false" aria-label="Соки" tabindex="-1">Соки</button>
-                <button class="category-btn" onclick="filterProducts('water')" role="tab" aria-selected="false" aria-label="Вода" tabindex="-1">Вода</button>
-                <button class="category-btn" onclick="filterProducts('coffee')" role="tab" aria-selected="false" aria-label="Кофе" tabindex="-1">Кофе</button>
-            </div>
-
-            <!-- Products Grid -->
-            <div class="products-grid" id="productsGrid" aria-label="Список товаров">
-                <!-- Products will be loaded here -->
-            </div>
-            
-            <!-- Featured Products Section -->
-            <div class="featured-section">
-                <h2 class="section-title">🔥 Хиты продаж</h2>
-                <div class="featured-products" id="featuredProducts" aria-label="Популярные товары">
-                    <!-- Featured products will be loaded here -->
+        <!-- Main Content Area -->
+        <main id="main-content" class="container">
+            <!-- Catalog will be loaded here by default -->
+            <div id="catalog-page">
+                <div class="catalog-header">
+                    <h2>Каталог энергетических напитков</h2>
+                    <span class="age-restriction-badge">18+</span>
                 </div>
-            </div>
-            
-            <!-- Promotions Section -->
-            <div class="promotions-section">
-                <h2 class="section-title">🎁 Специальные предложения</h2>
-                <div class="promotions-container">
-                    <div class="promotion-card">
-                        <div class="promotion-icon">🎉</div>
-                        <h3>Скидка 10%</h3>
-                        <p>На заказы от 1500₽</p>
-                    </div>
-                    <div class="promotion-card">
-                        <div class="promotion-icon">🚚</div>
-                        <h3>Бесплатная доставка</h3>
-                        <p>При заказе от 1000₽</p>
-                    </div>
-                    <div class="promotion-card">
-                        <div class="promotion-icon">⭐</div>
-                        <h3>ZeSt Club</h3>
-                        <p>Эксклюзивные цены</p>
-                    </div>
+                <div class="search-container">
+                    <input type="text" id="search-input" class="form-control" placeholder="Поиск напитков...">
                 </div>
-            </div>
-        </div>
-
-        <!-- ZeSt Club Tab -->
-        <div class="tab-content" id="club" role="tabpanel" aria-labelledby="club-tab">
-            <div class="club-header">
-                <div class="club-logo">
-                    <div class="star-icon">⭐</div>
-                    <h2>ZeSt Club</h2>
-                    <p>Эксклюзивные преимущества для наших клиентов</p>
-                </div>
-            </div>
-            
-            <div class="club-hero">
-                <div class="club-hero-content">
-                    <h3>Станьте участником ZeSt Club</h3>
-                    <p>Получите доступ к <span class="highlight">эксклюзивным ценам</span> и специальным предложениям</p>
-                </div>
-            </div>
-            
-            <div class="club-status-card">
-                <div class="status-info">
-                    <h3 id="clubStatusTitle">Вы не участник клуба</h3>
-                    <p id="clubStatusText">Присоединяйтесь к ZeSt Club и получите выгоды</p>
-                </div>
-                <button class="join-btn" id="clubActionButton" onclick="joinClub()">Присоединиться</button>
-            </div>
-            
-            <div class="club-benefits-section">
-                <h3>Преимущества участников</h3>
-                <div class="benefits-grid">
-                    <div class="benefit-card">
-                        <div class="benefit-icon-large">🥤</div>
-                        <h4>Энергетики по себестоимости</h4>
-                        <p>Покупайте энергетики по цене их производства</p>
-                    </div>
-                    <div class="benefit-card">
-                        <div class="benefit-icon-large">🚚</div>
-                        <h4>Бесплатная доставка</h4>
-                        <p>Абсолютно бесплатная доставка по всему городу</p>
-                    </div>
-                    <div class="benefit-card">
-                        <div class="benefit-icon-large">🎉</div>
-                        <h4>Специальные акции</h4>
-                        <p>Участие в розыгрышах и эксклюзивные предложения</p>
-                    </div>
-                    <div class="benefit-card">
-                        <div class="benefit-icon-large">🎁</div>
-                        <h4>Подарки на день рождения</h4>
-                        <p>Специальные подарки в ваш день рождения</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="membership-info">
-                <h3>Статистика участия</h3>
-                <div class="membership-stats">
-                    <div class="stat">
-                        <span class="stat-value" id="totalSavings">0 ₽</span>
-                        <span class="stat-label">Экономия</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-value" id="totalOrders">0</span>
-                        <span class="stat-label">Заказов</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-value" id="subscriptionStatus">Не активна</span>
-                        <span class="stat-label">Подписка</span>
-                    </div>
-                </div>
-                <div class="subscription-actions">
-                    <button class="cancel-subscription-btn" id="subscriptionButton" onclick="manageSubscription()" style="display: none;">Управление подпиской</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Cart Tab -->
-        <div class="tab-content" id="cart" role="tabpanel" aria-labelledby="cart-tab">
-            <div class="cart-header">
-                <h2>Ваша корзина</h2>
-                <button class="clear-cart" onclick="clearCart()" aria-label="Очистить корзину">Очистить</button>
-            </div>
-            <div class="cart-items" id="cartItems">
-                <!-- Cart items will be loaded here -->
-            </div>
-            <div class="cart-footer">
-                <div class="price-breakdown" id="priceBreakdown">
-                    <!-- Price breakdown will be loaded here -->
-                </div>
-                <button class="checkout-btn" onclick="initiateCheckout()" aria-label="Оформить заказ">Оформить заказ</button>
-            </div>
-        </div>
-
-        <!-- Orders Tab -->
-        <div class="tab-content" id="orders" role="tabpanel" aria-labelledby="orders-tab">
-            <div class="orders-header">
-                <h2>История заказов</h2>
-            </div>
-            <div class="orders-list" id="ordersList">
-                <!-- Orders will be loaded here -->
-            </div>
-        </div>
-
-        <!-- Admin Tab -->
-        <div class="tab-content" id="admin" role="tabpanel" aria-labelledby="admin-tab">
-            <div class="admin-header">
-                <h2>Панель администратора</h2>
-                <button class="secondary-btn" onclick="logoutAdmin()" style="margin-left: auto;">Выйти</button>
-            </div>
-            
-            <!-- Store Statistics -->
-            <div class="admin-section">
-                <h3>Статистика магазина</h3>
-                <div class="stats-container" id="storeStats">
-                    <!-- Stats will be loaded here -->
-                </div>
-            </div>
-            
-            <div class="admin-section">
-                <h3>Добавить новый товар</h3>
-                <form class="admin-form" id="addProductForm">
-                    <input type="hidden" id="productId">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="productName">Название товара *</label>
-                            <input type="text" id="productName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="productBrand">Бренд *</label>
-                            <input type="text" id="productBrand" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="productCategory">Категория *</label>
-                            <select id="productCategory" required>
-                                <option value="">Выберите категорию</option>
-                                <option value="energy">Энергетики</option>
-                                <option value="soda">Газировка</option>
-                                <option value="juice">Соки</option>
-                                <option value="water">Вода</option>
-                                <option value="coffee">Кофе</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="productVolume">Объем *</label>
-                            <input type="text" id="productVolume" placeholder="Например: 330 мл" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="regularPrice">Обычная цена (₽) *</label>
-                            <input type="number" id="regularPrice" min="1" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="clubPrice">Цена для клуба (₽) *</label>
-                            <input type="number" id="clubPrice" min="1" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="productImage">URL изображения *</label>
-                        <input type="url" id="productImage" placeholder="https://example.com/image.jpg" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="productDescription">Описание</label>
-                        <textarea id="productDescription" rows="3"></textarea>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="productBadge">Бейдж (например: Хит, Популярный)</label>
-                            <input type="text" id="productBadge">
-                        </div>
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" id="isFeatured"> 
-                                Отображать в хитах продаж
-                            </label>
-                        </div>
-                    </div>
-                    <div class="admin-controls">
-                        <button type="submit" class="primary-btn" id="productFormButton">Добавить товар</button>
-                        <button type="button" class="secondary-btn" onclick="resetProductForm()">Отмена</button>
-                    </div>
-                </form>
-            </div>
-            
-            <div class="admin-section">
-                <h3>Список товаров</h3>
-                <div class="admin-controls">
-                    <input type="text" id="searchAdminProducts" placeholder="Поиск товаров..." oninput="searchAdminProducts()" class="search-input">
-                    <button type="button" class="secondary-btn" onclick="exportProducts()">Экспорт товаров</button>
-                    <button type="button" class="secondary-btn" onclick="importProducts()">Импорт товаров</button>
-                    <select id="sortProducts" onchange="sortAdminProducts()" class="sort-select">
-                        <option value="id">По ID</option>
-                        <option value="name">По названию</option>
-                        <option value="price">По цене (возр.)</option>
-                        <option value="priceDesc">По цене (убыв.)</option>
-                        <option value="brand">По бренду</option>
+                <div class="filters">
+                    <select id="brand-filter" class="form-control">
+                        <option value="">Все бренды</option>
+                    </select>
+                    <select id="price-filter" class="form-control">
+                        <option value="">Все цены</option>
+                        <option value="0-100">До 100₽</option>
+                        <option value="100-150">100₽ - 150₽</option>
+                        <option value="150">От 150₽</option>
                     </select>
                 </div>
-                <div class="products-list" id="adminProductsList">
+                <div id="products-container">
                     <!-- Products will be loaded here -->
                 </div>
             </div>
             
-            <div class="admin-section">
-                <h3>Заказы</h3>
-                <div class="admin-controls">
-                    <input type="text" id="searchAdminOrders" placeholder="Поиск заказов..." oninput="searchAdminOrders()" class="search-input">
-                    <select id="sortOrders" onchange="sortAdminOrders()" class="sort-select">
-                        <option value="id">По ID</option>
-                        <option value="date">По дате</option>
-                        <option value="total">По сумме (возр.)</option>
-                        <option value="totalDesc">По сумме (убыв.)</option>
-                    </select>
+            <!-- ZeSt Club Page -->
+            <div id="club-page" class="hidden">
+                <div class="club-hero">
+                    <h2>ZeSt Club</h2>
+                    <p>Подпишитесь на ZeSt Club всего за 350 руб/месяц и получите:</p>
+                    <span class="age-restriction-badge">18+</span>
                 </div>
-                <div class="orders-list" id="adminOrdersList">
-                    <!-- Orders will be loaded here -->
+                <div class="club-benefits">
+                    <div class="benefit-card card">
+                        <div class="benefit-icon">💰</div>
+                        <h3>Оптовые цены</h3>
+                        <p>Скидки на все товары</p>
+                    </div>
+                    <div class="benefit-card card">
+                        <div class="benefit-icon">🚚</div>
+                        <h3>Бесплатная доставка</h3>
+                        <p>По всему городу</p>
+                    </div>
+                    <div class="benefit-card card">
+                        <div class="benefit-icon">🎁</div>
+                        <h3>Эксклюзивные преимущества</h3>
+                        <p>Специальные предложения</p>
+                    </div>
+                </div>
+                <button id="subscribe-button" class="btn btn-block">Оформить подписку</button>
+            </div>
+            
+            <!-- Additional Services Page -->
+            <div id="services-page" class="hidden">
+                <h2>Дополнительные услуги</h2>
+                <span class="age-restriction-badge">18+</span>
+                <div class="services-list">
+                    <div class="service-card">
+                        <h3>Доставка в Нарьян-Мар</h3>
+                        <p>50 руб</p>
+                    </div>
+                    <div class="service-card">
+                        <h3>Доставка в рп. Искатели</h3>
+                        <p>15 руб</p>
+                    </div>
+                    <div class="service-card">
+                        <h3>Точное время доставки</h3>
+                        <p>+10 руб к тарифу доставки</p>
+                    </div>
+                    <div class="service-card">
+                        <h3>Пакет</h3>
+                        <p>8 руб</p>
+                    </div>
+                    <div class="service-card">
+                        <h3>Подарочная упаковка</h3>
+                        <p>35 руб</p>
+                    </div>
+                    <div class="service-card">
+                        <h3>Открытка</h3>
+                        <p>50 руб</p>
+                    </div>
                 </div>
             </div>
-
-            <!-- Confirmation Modal for Order Deletion -->
-            <div class="modal" id="confirmDeleteModal" role="dialog" aria-labelledby="confirmDeleteTitle" aria-modal="true">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 id="confirmDeleteTitle">Подтвердите удаление</h3>
-                        <button class="close-modal" onclick="closeConfirmDeleteModal()" aria-label="Закрыть">&times;</button>
+            
+            <!-- Cart Page -->
+            <div id="cart-page" class="hidden">
+                <div class="cart-header">
+                    <h2>Ваша корзина</h2>
+                    <span class="age-restriction-badge">18+</span>
+                </div>
+                <div id="cart-items" class="cart-items">
+                    <!-- Cart items will be loaded here -->
+                </div>
+                <div class="cart-summary">
+                    <div class="cart-total">
+                        <span>Итого:</span>
+                        <span id="cart-total">0 руб</span>
                     </div>
-                    <div class="modal-body">
-                        <p>Вы уверены, что хотите удалить заказ №<span id="deleteOrderId"></span>? Это действие нельзя отменить.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="cancel-btn" onclick="closeConfirmDeleteModal()">Отмена</button>
-                        <button class="delete-btn" onclick="confirmDeleteOrder()">Удалить</button>
-                    </div>
+                    <button id="checkout-button" class="btn btn-block">Оформить заказ</button>
                 </div>
             </div>
-        </div>
-    </main>
-
-    <!-- Product Modal -->
-    <div class="modal" id="productModal" role="dialog" aria-labelledby="modalProductName" aria-modal="true">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalProductName"></h3>
-                <button class="close-modal" onclick="closeModal()" aria-label="Закрыть">&times;</button>
-            </div>
-            <div class="modal-body">
-                <img id="modalProductImage" src="" alt="" onerror="handleImageError(this)">
-                <div class="product-details">
-                    <p id="modalProductDescription"></p>
-                    <div class="product-specs">
-                        <div class="spec">
-                            <span>Объем:</span>
-                            <span id="modalProductVolume"></span>
-                        </div>
-                        <div class="spec">
-                            <span>Бренд:</span>
-                            <span id="modalProductBrand"></span>
-                        </div>
-                    </div>
-                    <div class="price-info">
-                        <div class="regular-price">
-                            <span>Обычная цена:</span>
-                            <span id="modalRegularPrice"></span>
-                        </div>
-                        <div class="club-price-info" id="modalClubPriceInfo">
-                            <span>Цена для клуба:</span>
-                            <span id="modalClubPrice"></span>
-                        </div>
-                    </div>
-                    <div class="quantity-selector">
-                        <button onclick="decreaseModalQuantity()" aria-label="Уменьшить количество">-</button>
-                        <span id="modalQuantity">1</span>
-                        <button onclick="increaseModalQuantity()" aria-label="Увеличить количество">+</button>
-                    </div>
-                    <button class="add-to-cart-btn" onclick="addToCartFromModal()">Добавить в корзину</button>
+            
+            <!-- Profile Page -->
+            <div id="profile-page" class="hidden">
+                <div class="profile-header">
+                    <h2>Профиль</h2>
+                    <span class="age-restriction-badge">18+</span>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Checkout Modal -->
-    <div class="payment-modal" id="checkoutModal" role="dialog" aria-labelledby="checkoutTitle" aria-modal="true">
-        <div class="payment-content">
-            <div class="checkout-header">
-                <h2 id="checkoutTitle">Оформление заказа</h2>
-            </div>
-            <div class="checkout-steps">
-                <div class="step active" data-step="1">
-                    <div class="step-number">1</div>
-                    <div class="step-label">Корзина</div>
-                </div>
-                <div class="step" data-step="2">
-                    <div class="step-number">2</div>
-                    <div class="step-label">Доставка</div>
-                </div>
-                <div class="step" data-step="3">
-                    <div class="step-number">3</div>
-                    <div class="step-label">Оплата</div>
-                </div>
-            </div>
-            <div class="checkout-body">
-                <!-- Step 1: Order Summary -->
-                <div class="checkout-step active" id="checkoutStep1">
-                    <h3>Состав заказа</h3>
-                    <div class="order-summary-items" id="orderSummaryItems">
-                        <!-- Order items will be loaded here -->
-                    </div>
-                    <div class="order-summary-mini" id="orderSummaryMini">
-                        <h4>Итого</h4>
-                        <div class="delivery-summary">
-                            <p>
-                                <span>Доставка:</span>
-                                <span id="deliveryCostSummary">50 ₽</span>
-                            </p>
+                
+                <div class="settings-panel">
+                    <h3>Настройки</h3>
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <span class="setting-label">Тема</span>
+                            <select id="theme-selector" class="form-control" style="width: auto;">
+                                <option value="light">Светлая</option>
+                                <option value="dark">Темная</option>
+                            </select>
                         </div>
-                        <div class="services-summary" id="servicesSummary">
-                            <p>Дополнительные услуги:</p>
-                            <ul id="servicesList">
-                                <!-- Services will be loaded here -->
-                            </ul>
-                        </div>
-                        <div class="total-summary">
-                            <p>
-                                <span>Итого:</span>
-                                <span id="totalSummary">0 ₽</span>
-                            </p>
+                        <div class="setting-item">
+                            <span class="setting-label">Уведомления</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="notifications-toggle" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
                         </div>
                     </div>
-                    <div class="checkout-actions">
-                        <button class="cancel-payment" onclick="closeCheckoutModal()">Отмена</button>
-                        <button class="confirm-payment" onclick="proceedToStep(2)">Продолжить</button>
+                    
+                    <div class="settings-group">
+                        <h3>Аккаунт</h3>
+                        <div class="setting-item">
+                            <span class="setting-label">Статус подписки ZeSt Club</span>
+                            <span id="subscription-status-text">Не активна</span>
+                        </div>
+                        <button id="toggle-subscription" class="btn btn-block">Управление подпиской</button>
+                        <button id="clear-data-button" class="btn btn-outline btn-block" style="margin-top: 1rem;">Очистить данные</button>
                     </div>
                 </div>
                 
-                <!-- Step 2: Delivery and Contact Info -->
-                <div class="checkout-step" id="checkoutStep2">
-                    <h3>Доставка и контактная информация</h3>
-                    
-                    <!-- Delivery Options -->
-                    <div class="delivery-options">
-                        <h4>Способ доставки</h4>
-                        <div class="delivery-option" onclick="selectDeliveryOption('standard')">
-                            <input type="radio" name="deliveryOption" id="deliveryStandard" value="standard">
-                            <div class="delivery-icon">🚚</div>
-                            <div class="delivery-info">
-                                <h4>Доставка по г. Нарьян-Мару</h4>
-                                <div class="delivery-time">В течение 1-2 часов</div>
-                                <div class="delivery-price">50 ₽</div>
-                            </div>
-                        </div>
-                        <div class="delivery-option" onclick="selectDeliveryOption('remote')">
-                            <input type="radio" name="deliveryOption" id="deliveryRemote" value="remote">
-                            <div class="delivery-icon">📍</div>
-                            <div class="delivery-info">
-                                <h4>Доставка по рп. Искатели</h4>
-                                <div class="delivery-time">В течение 2-3 часов</div>
-                                <div class="delivery-price">15 ₽</div>
-                            </div>
-                        </div>
-                        <div class="delivery-option" onclick="selectDeliveryOption('express')">
-                            <input type="radio" name="deliveryOption" id="deliveryExpress" value="express">
-                            <div class="delivery-icon">⏰</div>
-                            <div class="delivery-info">
-                                <h4>Доставка точно ко времени</h4>
-                                <div class="delivery-time">Указанное время</div>
-                                <div class="delivery-price">+10 ₽ к стоимости доставки</div>
-                            </div>
-                        </div>
-                        <div class="delivery-option" onclick="selectDeliveryOption('pickup')">
-                            <input type="radio" name="deliveryOption" id="deliveryPickup" value="pickup">
-                            <div class="delivery-icon">🏪</div>
-                            <div class="delivery-info">
-                                <h4>Самовывоз</h4>
-                                <div class="delivery-time">По адресу: ул. Ленина, 15</div>
-                                <div class="delivery-price">Бесплатно</div>
-                            </div>
-                        </div>
+                <div class="order-history">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3>История заказов</h3>
+                        <button id="refresh-orders" class="btn btn-sm">Обновить</button>
                     </div>
-                    
-                    <!-- Additional Services -->
-                    <div class="additional-services">
-                        <h4>Дополнительные услуги</h4>
-                        <div class="service-option" onclick="toggleAdditionalService('bag')">
-                            <input type="checkbox" id="serviceBag" value="bag">
-                            <div class="service-info">
-                                <h4>Пакет</h4>
-                                <div class="service-price">8 ₽</div>
-                            </div>
-                        </div>
-                        <div class="service-option" onclick="toggleAdditionalService('card')">
-                            <input type="checkbox" id="serviceCard" value="card">
-                            <div class="service-info">
-                                <h4>Открытка</h4>
-                                <div class="service-price">35 ₽</div>
-                            </div>
-                        </div>
-                        <div class="service-option" onclick="toggleAdditionalService('special')">
-                            <input type="checkbox" id="serviceSpecial" value="special">
-                            <div class="service-info">
-                                <h4>Специальная упаковка</h4>
-                                <div class="service-price">15 ₽</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Contact Form -->
-                    <div class="contact-form">
-                        <h3>Контактная информация</h3>
-                        <div class="form-group required">
-                            <label for="checkoutName">Имя *</label>
-                            <input type="text" id="checkoutName" required>
-                        </div>
-                        <div class="form-group required">
-                            <label for="checkoutPhone">Телефон *</label>
-                            <input type="tel" id="checkoutPhone" placeholder="+7 (___) ___-__-__" required>
-                        </div>
-                        <div class="form-group" id="addressField">
-                            <label for="checkoutAddress">Адрес доставки</label>
-                            <input type="text" id="checkoutAddress" placeholder="Улица, дом, квартира">
-                        </div>
-                        <div class="form-group">
-                            <label for="checkoutComment">Комментарий к заказу</label>
-                            <textarea id="checkoutComment" rows="3"></textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="checkout-actions">
-                        <button class="cancel-payment" onclick="proceedToStep(1)">Назад</button>
-                        <button class="confirm-payment" onclick="proceedToStep(3)">Продолжить</button>
-                    </div>
-                </div>
-                
-                <!-- Step 3: Payment Method -->
-                <div class="checkout-step" id="checkoutStep3">
-                    <h3>Способ оплаты</h3>
-                    
-                    <!-- Payment Methods -->
-                    <div class="payment-methods">
-                        <div class="payment-method" onclick="selectPaymentMethod('cash')">
-                            <input type="radio" name="paymentMethod" id="paymentCash" value="cash" checked>
-                            <div class="payment-icon">💵</div>
-                            <div class="payment-info">
-                                <h4>Наличными</h4>
-                                <p>Оплата при получении</p>
-                            </div>
-                        </div>
-                        <div class="payment-method" onclick="selectPaymentMethod('card')">
-                            <input type="radio" name="paymentMethod" id="paymentCard" value="card">
-                            <div class="payment-icon">💳</div>
-                            <div class="payment-info">
-                                <h4>Банковской картой</h4>
-                                <p>Оплата курьеру картой</p>
-                            </div>
-                        </div>
-                        <div class="payment-method" onclick="selectPaymentMethod('online')">
-                            <input type="radio" name="paymentMethod" id="paymentOnline" value="online">
-                            <div class="payment-icon">📱</div>
-                            <div class="payment-info">
-                                <h4>Онлайн оплата</h4>
-                                <p>Через СБП или банковское приложение</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Order Summary -->
-                    <div class="order-summary-mini">
-                        <h4>Итого к оплате</h4>
-                        <div class="delivery-summary">
-                            <p>
-                                <span>Доставка:</span>
-                                <span id="finalDeliveryCost">50 ₽</span>
-                            </p>
-                        </div>
-                        <div class="services-summary" id="finalServicesSummary">
-                            <p>Дополнительные услуги:</p>
-                            <ul id="finalServicesList">
-                                <!-- Services will be loaded here -->
-                            </ul>
-                        </div>
-                        <div class="total-summary">
-                            <p>
-                                <span>Итого:</span>
-                                <span id="finalTotal">0 ₽</span>
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div class="checkout-actions">
-                        <button class="cancel-payment" onclick="proceedToStep(2)">Назад</button>
-                        <button class="confirm-payment" onclick="processPayment()">Оплатить</button>
+                    <div id="orders-list">
+                        <!-- Orders will be loaded here -->
+                        <p id="no-orders-message">У вас пока нет заказов</p>
+                        <div id="orders-container"></div>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
+        
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-button active" data-page="catalog">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span>Каталог</span>
+            </div>
+            <div class="nav-button" data-page="club">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                <span>ZeSt Club</span>
+            </div>
+            <div class="nav-button" data-page="services">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z"/></svg>
+                <span>Услуги</span>
+            </div>
+            <div class="nav-button" data-page="cart">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                <span>Корзина</span>
+            </div>
+            <div class="nav-button" data-page="profile">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <span>Профиль</span>
+            </div>
+        </nav>
     </div>
 
-    <!-- Admin Login Modal -->
-    <div class="payment-modal" id="adminLoginModal" role="dialog" aria-labelledby="adminLoginTitle" aria-modal="true">
-        <div class="payment-content">
-            <div class="payment-header">
-                <h2 id="adminLoginTitle">Вход в панель администратора</h2>
-            </div>
-            <div class="payment-body">
-                <div class="form-group">
-                    <label for="adminPassword">Пароль администратора</label>
-                    <input type="password" id="adminPassword" placeholder="Введите пароль">
-                </div>
-                <div class="login-actions">
-                    <button class="cancel-payment" onclick="closeAdminLoginModal()">
-                        Отмена
-                    </button>
-                    <button class="confirm-payment" onclick="authenticateAdmin()">
-                        Войти
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Success Modal -->
-    <div class="modal" id="successModal" role="dialog" aria-labelledby="successTitle" aria-modal="true">
-        <div class="modal-content">
-            <div class="success-animation">
-                <div class="success-icon">✅</div>
-                <div class="success-message">
-                    <h3 id="successTitle">Заказ оформлен!</h3>
-                    <p>Ваш заказ успешно оформлен и будет доставлен в ближайшее время.</p>
-                    <div class="order-number">
-                        Номер заказа: <span id="successOrderNumber"></span>
-                    </div>
-                    <div class="delivery-info">
-                        <h4>Информация о доставке</h4>
-                        <p>Наш курьер свяжется с вами по телефону для уточнения деталей доставки.</p>
-                    </div>
-                    <button class="add-to-cart-btn" onclick="closeSuccessModal()">Продолжить покупки</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Subscription Modal -->
-    <div class="modal" id="subscriptionModal" role="dialog" aria-labelledby="subscriptionTitle" aria-modal="true">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="subscriptionTitle">ZeSt Club Подписка</h3>
-                <button class="close-modal" onclick="closeSubscriptionModal()" aria-label="Закрыть">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="subscription-content">
-                    <h4>Станьте участником ZeSt Club!</h4>
-                    <p>За небольшую плату в размере 199₽ в месяц вы получите:</p>
-                    <ul class="benefits-list">
-                        <li>Энергетики по себестоимости</li>
-                        <li>Бесплатную доставку по всему городу</li>
-                        <li>Эксклюзивные предложения и скидки</li>
-                        <li>Участие в розыгрышах призов</li>
-                        <li>Подарки на день рождения</li>
-                    </ul>
-                    <div class="subscription-actions">
-                        <button class="add-to-cart-btn" onclick="confirmSubscription()">Оформить подписку</button>
-                        <button class="cancel-btn" onclick="closeSubscriptionModal()">Отмена</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Agreement Modal -->
-    <div class="modal" id="agreementModal" role="dialog" aria-labelledby="agreementTitle" aria-modal="true">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="agreementTitle">Пользовательское соглашение</h3>
-                <button class="close-modal" onclick="closeAgreementModal()" aria-label="Закрыть">&times;</button>
-            </div>
-            <div class="modal-body">
-                <h4>1. Общие положения</h4>
-                <p>Настоящее Пользовательское соглашение регулирует отношения между ZeSt Shop и пользователем при использовании сервиса.</p>
-                
-                <h4>2. Условия использования</h4>
-                <p>Пользователь обязуется предоставлять достоверную информацию при оформлении заказов и соблюдать правила доставки.</p>
-                
-                <h4>3. Оплата и доставка</h4>
-                <p>Оплата производится согласно выбранному способу. Доставка осуществляется в течение указанного срока.</p>
-                
-                <div class="agreement">
-                    <label>
-                        <input type="checkbox" id="agreeCheckbox"> 
-                        Я согласен с условиями пользовательского соглашения
-                    </label>
-                </div>
-                
-                <button class="add-to-cart-btn" onclick="acceptAgreement()" disabled id="acceptAgreementBtn">Принять</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Loading Spinner -->
-    <div class="loading" id="loadingSpinner">
-        <div class="spinner"></div>
-        <p>Обработка заказа...</p>
-    </div>
-
-    <!-- Toast Notification -->
-    <div class="toast" id="toast" aria-live="polite" aria-atomic="true"></div>
-
-    <script src="script.js"></script>
+    <script src="js/modules/telegram.js"></script>
+    <script src="js/modules/cart.js"></script>
+    <script src="js/modules/catalog.js"></script>
+    <script src="js/modules/payment.js"></script>
+    <script src="js/modules/order.js"></script>
+    <script src="js/modules/profile.js"></script>
+    <script src="js/modules/gestures.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
